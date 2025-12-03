@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  mongo:
+    image: mongo:6.0
+    restart: unless-stopped
+    volumes:
+      - mongo-data:/data/db
+    ports:
+      - "27017:27017"
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file:
+      - ./backend/.env
+    depends_on:
+      - mongo
+    ports:
+      - "5001:5000"
+
+  frontend:
+    build:
+      context: ./frontend-nextjs
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_BASE: "http://backend:5000/api"
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "3000:3000"
+
+volumes:
+  mongo-data:
