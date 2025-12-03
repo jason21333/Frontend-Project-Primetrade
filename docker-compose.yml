@@ -1,0 +1,40 @@
+services:
+  mongo:
+    image: mongo:6.0
+    restart: unless-stopped
+    volumes:
+      - mongo-data:/data/db
+    ports:
+      - "27017:27017"
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file:
+      - ./backend/.env
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/primetrade
+      - NODE_ENV=production
+    depends_on:
+      - mongo
+    ports:
+      - "5001:5000"
+
+  frontend:
+    build:
+      context: ./frontend-nextjs
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_BASE: "http://localhost:5001/api"
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+
+volumes:
+  mongo-data:
