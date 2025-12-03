@@ -1,142 +1,220 @@
-# Frontend Project Primetrade — MERN Stack
+# MERN App — Scalable Web App with Authentication & Dashboard
 
-Welcome! This repository contains a scalable web application with authentication and a protected dashboard, built with the **MERN Stack** (MongoDB, Express, React, Node.js).
+A complete **MERN Stack** project (MongoDB, Express, React, Node.js) with:
+- ✅ User Authentication (Register / Login with JWT)
+- ✅ Protected Dashboard (token-based access)
+- ✅ Scalable Backend API
+- ✅ React Frontend with Vite
+- ✅ Docker & Docker Compose for local development
+- ✅ MongoDB Atlas ready
 
-## 🎯 What You Get
-
-- ✅ **Backend API** — Express.js + MongoDB with user authentication
-- ✅ **Frontend App** — React + Vite with protected routes
-- ✅ **Docker Setup** — One command to run everything locally
-- ✅ **JWT Authentication** — Secure token-based user sessions
-- ✅ **Scalable Architecture** — Ready for production deployment
-
-## 📦 What's Inside
+## 📁 Project Structure
 
 ```
-/
-├── mern-app/                 # Main MERN application
-│   ├── backend/              # Express API (port 5000)
-│   ├── frontend/             # React app (port 5173)
-│   ├── docker-compose.yml    # Docker orchestration
-│   ├── README.md             # Detailed setup guide
-│   └── DOCKER.md             # Docker-specific instructions
-└── README.md                 # This file
+mern-app/
+├── backend/                  # Express + Mongoose API
+│   ├── controllers/
+│   ├── models/              # User schema
+│   ├── middleware/          # JWT auth middleware
+│   ├── routes/              # Auth & Dashboard routes
+│   ├── Dockerfile
+│   ├── package.json
+│   ├── server.js
+│   ├── .env.example
+│   └── README.md
+├── frontend/                # Vite + React
+│   ├── src/
+│   │   ├── pages/           # Login, Register, Dashboard
+│   │   ├── main.jsx
+│   │   ├── api.js           # Axios client
+│   │   └── index.css
+│   ├── Dockerfile
+│   ├── package.json
+│   ├── index.html
+│   └── README.md
+├── docker-compose.yml       # Orchestrates all services
+├── .dockerignore
+└── DOCKER.md               # Docker setup guide
 ```
 
-## 🚀 Get Started in 30 Seconds
+## 🚀 Quick Start with Docker
 
-### Option 1: With Docker (Recommended)
+**Prerequisites:** Docker & Docker Compose installed ([Get Docker](https://docs.docker.com/get-docker/))
+
+### 1. Start All Services
 
 ```bash
 cd mern-app
 docker-compose up -d --build
-
-# Open browser to http://localhost:5173
-# Register → Login → View Dashboard
 ```
 
-### Option 2: Manual Setup
+**Services will be available at:**
+- Frontend: http://localhost:5173
+- Backend API: http://localhost:5000/api
+- MongoDB: localhost:27017 (user: `root`, password: `password`)
 
-**Backend:**
-```bash
-cd mern-app/backend
-npm install
-npm run dev
-```
+### 2. Test the App
 
-**Frontend (new terminal):**
+1. Open http://localhost:5173 in your browser
+2. Click **Register** and create an account
+3. Login with your credentials
+4. View your protected dashboard
+
+### 3. Stop Services
+
 ```bash
-cd mern-app/frontend
-npm install
-npm run dev
+# Stop but keep data
+docker-compose stop
+
+# Stop and remove containers (keeps volumes)
+docker-compose down
+
+# Stop, remove containers, and delete all data
+docker-compose down -v
 ```
 
 ---
 
-## 📖 Documentation
+## 🛠️ Manual Local Setup (without Docker)
 
-- **[mern-app/README.md](mern-app/README.md)** — Full project documentation, API endpoints, deployment guides
-- **[mern-app/DOCKER.md](mern-app/DOCKER.md)** — Docker-specific setup and troubleshooting
-- **[mern-app/backend/README.md](mern-app/backend/README.md)** — Backend API details
-- **[mern-app/frontend/README.md](mern-app/frontend/README.md)** — Frontend setup
+### Backend
+
+```bash
+cd backend
+cp .env.example .env
+
+# Edit .env with your MongoDB URI and JWT_SECRET
+nano .env
+
+npm install
+npm run dev
+```
+
+Backend runs on **http://localhost:5000**
+
+### Frontend
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Frontend runs on **http://localhost:5173**
 
 ---
 
-## 🔐 Features
+## 📚 API Endpoints
 
 ### Authentication
-- User registration with email & password
-- Login with JWT token generation
-- Password hashing with bcryptjs
-- 7-day token expiration
 
-### Authorization
-- Protected dashboard route (requires valid token)
-- Automatic redirect to login for unauthorized access
-- Token stored in localStorage
+- **POST** `/api/auth/register`  
+  Body: `{ name, email, password }`  
+  Response: `{ token, user: { id, name, email } }`
 
-### API
-- RESTful endpoints for auth & dashboard
-- CORS enabled for development
-- Mongoose schema validation
+- **POST** `/api/auth/login`  
+  Body: `{ email, password }`  
+  Response: `{ token, user: { id, name, email } }`
 
----
+### Protected Routes
 
-## 🛠️ Tech Stack
-
-| Component | Technology |
-|-----------|-----------|
-| Frontend | React 18, Vite, Axios, React Router |
-| Backend | Express.js, Node.js |
-| Database | MongoDB 7 |
-| Auth | JWT, bcryptjs |
-| DevOps | Docker, Docker Compose |
+- **GET** `/api/dashboard`  
+  Headers: `Authorization: Bearer <token>`  
+  Response: `{ message, userId }`
 
 ---
 
-## 🌐 Deployment
+## 🔑 Environment Variables
 
-Ready to deploy?
+### Backend (`.env`)
 
-- **Frontend:** Vercel, Netlify, AWS S3 + CloudFront
-- **Backend:** Heroku, Railway, Render, AWS Lambda
-- **Database:** MongoDB Atlas (free tier available)
-- **Full Stack:** Docker to AWS ECS, Google Cloud Run, Azure Container Instances
+```
+MONGO_URI=mongodb://localhost:27017/mern_app
+JWT_SECRET=your_secret_key_here
+PORT=5000
+```
 
-See [mern-app/README.md](mern-app/README.md#-deployment) for step-by-step deployment guides.
+### Frontend (optional `.env`)
+
+```
+VITE_API_BASE=http://localhost:5000/api
+```
+
+---
+
+## 🔐 Security Notes
+
+- **Development:** JWT_SECRET is set to `your_jwt_secret_key_change_in_prod` in docker-compose.yml — change for production
+- **Password Hashing:** Uses bcryptjs with 10 salt rounds
+- **Token Expiry:** JWT tokens expire in 7 days
+- **CORS:** Enabled for localhost
+
+---
+
+## 📦 Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| **Frontend** | React 18, Vite, Axios, React Router |
+| **Backend** | Express.js, Node.js |
+| **Database** | MongoDB 7, Mongoose |
+| **Authentication** | JWT (jsonwebtoken), bcryptjs |
+| **Deployment** | Docker & Docker Compose |
+
+---
+
+## 🚢 Deployment
+
+### Option 1: Heroku + MongoDB Atlas (Recommended)
+
+```bash
+# 1. Create MongoDB Atlas cluster at https://www.mongodb.com/cloud/atlas
+# 2. Copy the connection string
+# 3. Deploy backend to Heroku
+heroku create your-app-name
+heroku config:set MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/mern_app
+heroku config:set JWT_SECRET=your_production_secret
+git push heroku main
+
+# 4. Deploy frontend to Vercel
+npm run build
+# Upload dist/ to Vercel
+```
+
+### Option 2: Docker to Any Cloud (AWS, GCP, Azure, DigitalOcean)
+
+```bash
+# Build and tag
+docker build -t your-registry/mern-app-backend:latest ./backend
+docker build -t your-registry/mern-app-frontend:latest ./frontend
+
+# Push
+docker push your-registry/mern-app-backend:latest
+docker push your-registry/mern-app-frontend:latest
+
+# Deploy with your cloud provider's orchestration (ECS, GKE, ACI, etc.)
+```
+
+---
+
+## 📝 Development Workflow
+
+1. **Make changes** in `backend/` or `frontend/`
+2. **Hot reload:** Vite dev server and nodemon will auto-reload
+3. **Commit:** `git add . && git commit -m "your message"`
+4. **Push:** `git push origin main`
 
 ---
 
 ## 🐛 Troubleshooting
 
-| Issue | Fix |
-|-------|-----|
-| Port already in use | Change port in docker-compose.yml |
-| MongoDB connection error | Verify MongoDB URI in .env |
-| CORS errors | Check API_BASE_URL in frontend |
-| Build fails | Run `docker system prune -a` |
-
----
-
-## 📋 Project Status
-
-- [x] Backend setup (Express + MongoDB)
-- [x] Frontend setup (React + Vite)
-- [x] Authentication routes (register, login)
-- [x] Protected dashboard
-- [x] Docker configuration
-- [ ] Email verification (future)
-- [ ] Refresh token rotation (future)
-- [ ] Rate limiting (future)
-
----
-
-## 🤝 Contributing
-
-1. Create a feature branch: `git checkout -b feature/my-feature`
-2. Commit changes: `git commit -m "add my feature"`
-3. Push to branch: `git push origin feature/my-feature`
-4. Open a Pull Request
+| Issue | Solution |
+|-------|----------|
+| Port 5000/5173 already in use | Kill process or change port in docker-compose.yml |
+| MongoDB connection refused | Ensure MongoDB is running; check MONGO_URI |
+| CORS errors | Update VITE_API_BASE in frontend or backend CORS config |
+| Docker images won't build | Run `docker system prune -a` to clean dangling images |
+| Can't login after registration | Clear browser localStorage and retry |
 
 ---
 
@@ -146,12 +224,44 @@ MIT
 
 ---
 
-**Questions?** Check the detailed README in the `mern-app/` directory or see `DOCKER.md` for Docker-specific help.
+## ✨ Next Steps
 
-**Ready to run?**
+- [ ] Add email verification
+- [ ] Implement refresh token rotation
+- [ ] Add API rate limiting (express-rate-limit)
+- [ ] Add request validation (joi or zod)
+- [ ] Add unit/integration tests
+- [ ] Setup GitHub Actions CI/CD
+- [ ] Add websockets for real-time features
+- [ ] Implement role-based access control (RBAC)
+
+---
+
+**Happy coding!** 🎉 (Auth + Dashboard)
+
+A small scaffold with:
+- Backend: Express + MongoDB (Mongoose), JWT auth
+- Frontend: Vite + React, simple login/register + protected dashboard
+
+Getting started
+
+1. Start MongoDB locally (or provide `MONGO_URI` pointing to a cloud MongoDB).
+2. Backend:
+
 ```bash
-cd mern-app
-docker-compose up -d --build
+cd mern-app/backend
+cp .env.example .env
+# edit .env to set MONGO_URI and JWT_SECRET
+npm install
+npm run dev
 ```
 
-🎉 Your app is running at http://localhost:5173!
+3. Frontend:
+
+```bash
+cd mern-app/frontend
+npm install
+npm run dev
+```
+
+By default fronted expects backend at `http://localhost:5000/api`. Set `VITE_API_BASE` if different.
