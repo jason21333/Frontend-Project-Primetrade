@@ -46,23 +46,6 @@ export default function DashboardPage() {
     router.push('/login')
   }
 
-  // Sample entities data - replace with API call later
-  const entities = [
-    { id: 'ENT-001', name: 'Project Alpha', owner: 'Cameron Williamson', status: 'Active', date: '2023-10-26' },
-    { id: 'ENT-002', name: 'Initiative Beta', owner: 'Robert Fox', status: 'Pending', date: '2023-10-25' },
-    { id: 'ENT-003', name: 'Taskforce Gamma', owner: 'Esther Howard', status: 'Active', date: '2023-10-24' },
-    { id: 'ENT-004', name: 'Operation Delta', owner: 'Kristin Watson', status: 'Inactive', date: '2023-10-22' },
-  ]
-
-  const getStatusBadge = (status) => {
-    const styles = {
-      Active: 'bg-green-900/50 text-green-300 border-green-500/30',
-      Pending: 'bg-yellow-900/50 text-yellow-300 border-yellow-500/30',
-      Inactive: 'bg-red-900/50 text-red-300 border-red-500/30',
-    }
-    return styles[status] || styles.Inactive
-  }
-
   if (!user) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background-dark text-on-surface-dark">
@@ -85,15 +68,6 @@ export default function DashboardPage() {
               </a>
               <a className="px-3 py-1.5 text-sm font-medium rounded-full text-on-surface-dark hover:bg-white/10 transition-colors" href="#">
                 Dashboard
-              </a>
-              <a className="px-3 py-1.5 text-sm font-medium rounded-full text-on-surface-dark hover:bg-white/10 transition-colors" href="#">
-                My apartments
-              </a>
-              <a className="px-3 py-1.5 text-sm font-medium rounded-full text-on-surface-dark hover:bg-white/10 transition-colors" href="#">
-                Reporting
-              </a>
-              <a className="px-3 py-1.5 text-sm font-medium rounded-full text-on-surface-dark hover:bg-white/10 transition-colors" href="#">
-                Settings
               </a>
             </nav>
 
@@ -121,106 +95,12 @@ export default function DashboardPage() {
             </div>
           </header>
 
-          {/* Charts Section */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-            <div className="p-6 bg-surface-dark border border-border-dark rounded-xl col-span-1 lg:col-span-2">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-lg font-semibold text-on-surface-dark">Total energy consumption</h2>
-                <button className="px-3 py-1 text-xs font-medium border rounded-full border-border-dark text-on-surface-secondary-dark hover:bg-white/10">
-                  Change module
-                </button>
-              </div>
-              <div className="h-48 bg-gray-800/50 rounded-lg flex items-center justify-center">
-                <p className="text-on-surface-secondary-dark">Chart Placeholder</p>
-              </div>
-            </div>
-
-            <div className="p-6 bg-surface-dark border border-border-dark rounded-xl">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-lg font-semibold text-on-surface-dark">Green connections</h2>
-                <button className="text-on-surface-secondary-dark hover:text-white">
-                  <span className="material-symbols-outlined">more_horiz</span>
-                </button>
-              </div>
-              <div className="h-48 bg-gray-800/50 rounded-lg flex items-center justify-center">
-                <p className="text-on-surface-secondary-dark">Visualization Placeholder</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Manage Entities Section */}
-          <div>
-            <div className="flex flex-wrap justify-between items-center gap-4 mb-4">
-              <h1 className="text-2xl font-bold leading-tight text-on-surface-dark">Manage Entities</h1>
-              <div className="flex items-center gap-4">
-                <div className="relative w-64">
-                  <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-secondary-dark">
-                    search
-                  </span>
-                  <input 
-                    className="w-full h-10 pl-10 pr-4 text-sm bg-surface-dark border rounded-lg border-border-dark focus:ring-2 focus:ring-primary focus:outline-none placeholder:text-on-surface-secondary-dark text-on-surface-dark"
-                    placeholder="Search entities..." 
-                    type="text"
-                  />
-                </div>
-                <div className="flex items-center gap-2">
-                  <button className="flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-surface-dark border border-border-dark px-4 text-sm font-medium text-on-surface-secondary-dark hover:bg-white/10">
-                    Status
-                    <span className="material-symbols-outlined text-sm">expand_more</span>
-                  </button>
-                  <button className="flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-surface-dark border border-border-dark px-4 text-sm font-medium text-on-surface-secondary-dark hover:bg-white/10">
-                    Date Range
-                    <span className="material-symbols-outlined text-sm">expand_more</span>
-                  </button>
-                </div>
-                <button className="flex min-w-[84px] cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-primary/90 transition-colors">
-                  <span className="material-symbols-outlined text-base" style={{ fontVariationSettings: "'wght' 500" }}>
-                    add
-                  </span>
-                  <span className="truncate">Add New</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Entities Table */}
-            <div className="overflow-x-auto bg-surface-dark rounded-xl border border-border-dark">
-              <table className="w-full text-sm text-left text-on-surface-secondary-dark">
-                <thead className="text-xs uppercase text-on-surface-secondary-dark">
-                  <tr>
-                    <th className="px-6 py-4 font-medium" scope="col">ID</th>
-                    <th className="px-6 py-4 font-medium" scope="col">Entity Name</th>
-                    <th className="px-6 py-4 font-medium" scope="col">Owner</th>
-                    <th className="px-6 py-4 font-medium" scope="col">Status</th>
-                    <th className="px-6 py-4 font-medium" scope="col">Date Created</th>
-                    <th className="px-6 py-4 font-medium text-right" scope="col">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {entities.map((entity) => (
-                    <tr key={entity.id} className="border-t border-border-dark hover:bg-white/5">
-                      <td className="px-6 py-4 font-medium text-on-surface-dark whitespace-nowrap">{entity.id}</td>
-                      <td className="px-6 py-4">{entity.name}</td>
-                      <td className="px-6 py-4">{entity.owner}</td>
-                      <td className="px-6 py-4">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getStatusBadge(entity.status)}`}>
-                          {entity.status}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4">{entity.date}</td>
-                      <td className="px-6 py-4 text-right">
-                        <div className="flex justify-end gap-4">
-                          <button className="hover:text-primary transition-colors" aria-label="Edit">
-                            <span className="material-symbols-outlined text-lg">edit</span>
-                          </button>
-                          <button className="hover:text-red-500 transition-colors" aria-label="Delete">
-                            <span className="material-symbols-outlined text-lg">delete</span>
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+          {/* Welcome Section */}
+          <div className="p-6 bg-surface-dark border border-border-dark rounded-xl">
+            <h1 className="text-2xl font-bold leading-tight text-on-surface-dark mb-4">Welcome, {user.name || user.email}</h1>
+            <div className="bg-gray-800/50 rounded-lg p-4">
+              <p className="text-on-surface-secondary-dark mb-2"><strong className="text-on-surface-dark">Email:</strong> {user.email}</p>
+              <p className="text-on-surface-secondary-dark"><strong className="text-on-surface-dark">User ID:</strong> {user._id}</p>
             </div>
           </div>
         </div>
