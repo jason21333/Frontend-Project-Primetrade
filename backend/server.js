@@ -17,10 +17,12 @@ app.use(passport.initialize())
 
 const authRoutes = require('./routes/auth');
 const dashboardRoutes = require('./routes/dashboard');
+const entityRoutes = require('./routes/entities');
 const oauthRoutes = require('./routes/oauth');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/entities', entityRoutes);
 // OAuth endpoints (server-side flows)
 app.use('/auth', oauthRoutes);
 
