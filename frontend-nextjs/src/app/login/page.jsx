@@ -121,9 +121,8 @@ export default function LoginPage() {
                 <label className="flex flex-col w-full">
                   <p className="text-white text-sm font-semibold leading-normal pb-2">Email</p>
                   <div className="relative flex w-full items-center">
-                    <span className="material-symbols-outlined absolute left-3 text-gray-400">mail</span>
                     <input
-                      className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-white/20 bg-white/10 focus:border-primary h-12 placeholder:text-gray-400 pl-10 pr-4 py-2 text-base font-semibold leading-normal"
+                      className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-white/20 bg-white/10 focus:border-primary h-12 placeholder:text-gray-400 pl-4 pr-4 py-2 text-base font-semibold leading-normal"
                       placeholder="Enter your email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
@@ -139,9 +138,8 @@ export default function LoginPage() {
   </p>
 
   <div className="relative flex w-full items-center">
-    {/* LEFT ICON */}
-  <input
-      className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-white/20 bg-white/10 focus:border-primary h-12 placeholder:text-gray-400 pl-10 pr-10 py-2 text-base font-semibold leading-normal"
+     <input
+      className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-white/20 bg-white/10 focus:border-primary h-12 placeholder:text-gray-400 pl-4 pr-10 py-2 text-base font-semibold leading-normal"
       placeholder="Enter your password"
       type="password"
       value={password}
@@ -150,13 +148,12 @@ export default function LoginPage() {
     />
   </div>
 </label>
-
-                <div className="flex flex-col items-stretch px-0 pt-4 pb-3">
-                  <button type="submit" className="glass-button">
-                    Log In
-                  </button>
-                </div>
-              </form>
+  <div className="flex flex-col items-stretch px-0 pt-4 pb-3">
+     <button type="submit" className="glass-button">
+      Log In
+      </button>
+    </div>
+    </form>
 
               {err && <p className="text-sm text-red-400 text-center">{err}</p>}
 
