@@ -140,11 +140,7 @@ export default function LoginPage() {
 
   <div className="relative flex w-full items-center">
     {/* LEFT ICON */}
-    <span className="material-symbols-outlined absolute left-3 text-gray-400">
-      lock   {/* make sure this is 'lock', not 'mail' */}
-    </span>
-
-    <input
+  <input
       className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-white/20 bg-white/10 focus:border-primary h-12 placeholder:text-gray-400 pl-10 pr-10 py-2 text-base font-semibold leading-normal"
       placeholder="Enter your password"
       type="password"
