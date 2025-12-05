@@ -254,11 +254,8 @@ export default function DashboardPage() {
               <h1 className="text-2xl font-bold leading-tight text-on-surface-dark">Manage Entities</h1>
               <div className="flex items-center gap-4">
                 <div className="relative w-64">
-                  <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-secondary-dark">
-                    search
-                  </span>
-                  <input 
-                    className="w-full h-10 pl-10 pr-4 text-sm bg-surface-dark border rounded-lg border-border-dark focus:ring-2 focus:ring-primary focus:outline-none placeholder:text-on-surface-secondary-dark text-on-surface-dark"
+                   <input 
+                    className="w-full h-10 pl-4 pr-4 text-sm bg-surface-dark border rounded-lg border-border-dark focus:ring-2 focus:ring-primary focus:outline-none placeholder:text-on-surface-secondary-dark text-on-surface-dark"
                     placeholder="Search entities..." 
                     type="text"
                     value={searchTerm}
