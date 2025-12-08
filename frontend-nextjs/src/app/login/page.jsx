@@ -5,13 +5,142 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import api from '@/lib/api'
 
+// Pure JavaScript Animated Wand Component (No TypeScript, No motion/react)
+const Wand = ({ width = 20, height = 20, strokeWidth = 2, stroke = "#ffffff", onClick }) => {
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  const handleMouseEnter = () => {
+    setIsAnimating(true);
+  };
+
+  const handleMouseLeave = () => {
+    setIsAnimating(false);
+  };
+
+  return (
+    <div
+      style={{
+        cursor: "pointer",
+        userSelect: "none",
+        padding: "4px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      onClick={onClick}
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width={width}
+        height={height}
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke={stroke}
+        strokeWidth={strokeWidth}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        {/* Main wand */}
+        <path 
+          d="m3 21 9-9"
+          style={{ opacity: 1, transition: 'opacity 0.2s ease-out' }}
+        />
+        
+        {/* Sparkles - Pure CSS Animation */}
+        <path 
+          d="M15 4V2"
+          style={{
+            opacity: isAnimating ? '1' : '1',
+            transform: `scale(${isAnimating ? '1.05' : '1'}) translateY(${isAnimating ? '-1px' : '0px'})`,
+            transition: 'opacity 1.2s ease-in-out, transform 1.2s ease-in-out',
+            transitionDelay: '0s'
+          }}
+        />
+        <path 
+          d="M15 16v-2"
+          style={{
+            opacity: isAnimating ? '1' : '1',
+            transform: `scale(${isAnimating ? '1.05' : '1'}) translateY(${isAnimating ? '-1px' : '0px'})`,
+            transition: 'opacity 1.2s ease-in-out, transform 1.2s ease-in-out',
+            transitionDelay: '0.1s'
+          }}
+        />
+        <path 
+          d="M8 9h2"
+          style={{
+            opacity: isAnimating ? '1' : '1',
+            transform: `scale(${isAnimating ? '1.05' : '1'}) translateY(${isAnimating ? '-1px' : '0px'})`,
+            transition: 'opacity 1.2s ease-in-out, transform 1.2s ease-in-out',
+            transitionDelay: '0.2s'
+          }}
+        />
+        <path 
+          d="M20 9h2"
+          style={{
+            opacity: isAnimating ? '1' : '1',
+            transform: `scale(${isAnimating ? '1.05' : '1'}) translateY(${isAnimating ? '-1px' : '0px'})`,
+            transition: 'opacity 1.2s ease-in-out, transform 1.2s ease-in-out',
+            transitionDelay: '0.3s'
+          }}
+        />
+        <path 
+          d="M17.8 11.8 19 13"
+          style={{
+            opacity: isAnimating ? '1' : '1',
+            transform: `scale(${isAnimating ? '1.05' : '1'}) translateY(${isAnimating ? '-1px' : '0px'})`,
+            transition: 'opacity 1.2s ease-in-out, transform 1.2s ease-in-out',
+            transitionDelay: '0.4s'
+          }}
+        />
+        <path 
+          d="M15 9h.01"
+          style={{
+            opacity: isAnimating ? '1' : '1',
+            transform: `scale(${isAnimating ? '1.05' : '1'}) translateY(${isAnimating ? '-1px' : '0px'})`,
+            transition: 'opacity 1.2s ease-in-out, transform 1.2s ease-in-out',
+            transitionDelay: '0.5s'
+          }}
+        />
+        <path 
+          d="M17.8 6.2 19 5"
+          style={{
+            opacity: isAnimating ? '1' : '1',
+            transform: `scale(${isAnimating ? '1.05' : '1'}) translateY(${isAnimating ? '-1px' : '0px'})`,
+            transition: 'opacity 1.2s ease-in-out, transform 1.2s ease-in-out',
+            transitionDelay: '0.6s'
+          }}
+        />
+        <path 
+          d="M12.2 6.2 11 5"
+          style={{
+            opacity: isAnimating ? '1' : '1',
+            transform: `scale(${isAnimating ? '1.05' : '1'}) translateY(${isAnimating ? '-1px' : '0px'})`,
+            transition: 'opacity 1.2s ease-in-out, transform 1.2s ease-in-out',
+            transitionDelay: '0.7s'
+          }}
+        />
+      </svg>
+    </div>
+  );
+};
+
 export default function LoginPage() {
   const router = useRouter()
   const containerRef = useRef(null)
   const vantaRef = useRef(null)
+  const [showPassword, setShowPassword] = useState(false)
+  const [capsLockOn, setCapsLockOn] = useState(false) 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [err, setErr] = useState('')
+
+  // Caps Lock detection handler
+  const handlePasswordKeyEvent = (e) => {
+    const isCaps = e.getModifierState && e.getModifierState('CapsLock')
+    setCapsLockOn(!!isCaps)
+  }
 
   useEffect(() => {
     let threeScript = null
@@ -43,7 +172,6 @@ export default function LoginPage() {
         try { vantaRef.current.destroy() } catch (e) {}
         vantaRef.current = null
       }
-      const isDark = document.documentElement.classList.contains('dark')
       vantaRef.current = window.VANTA.DOTS({
         el: containerRef.current,
         mouseControls: true,
@@ -54,8 +182,8 @@ export default function LoginPage() {
         scale: 1.0,
         scaleMobile: 1.0,
         color: 0xff7900,
-        color2: isDark ? 0xff7900 : 0xff7900,
-        backgroundColor: isDark ? 0x101322 : 0xf6f6f8,
+        color2: 0xff7900,
+        backgroundColor: 0x000000,  // ← PURE BLACK
         size: 3.5,
         spacing: 35.0,
       })
@@ -88,9 +216,8 @@ export default function LoginPage() {
     }
   }
 
-
   return (
-    <div ref={containerRef} id="vanta-bg" className="relative flex min-h-screen w-full flex-col bg-slate-950 dark:bg-slate-950 overflow-x-hidden">
+    <div ref={containerRef} id="vanta-bg" className="relative flex min-h-screen w-full flex-col bg-black overflow-x-hidden">
       {/* Developer Credit - Bottom Right */}
       <div className="absolute bottom-4 right-4 z-10">
         <a 
@@ -111,11 +238,11 @@ export default function LoginPage() {
           <div className="glassmorphism-card w-full max-w-md h-auto p-6 sm:p-8">
             <div className="card-content">
               <div className="flex items-center justify-center gap-2 pb-6">
-                <span className="material-symbols-outlined text-primary text-4xl">hexagon</span>
-                <h2 className="text-2xl font-bold tracking-tighter text-white">AETHER</h2>
+                <span className="material-symbols-outlined text-primary text-4xl">CRYPTO</span>
+                <h2 className="text-2xl font-bold tracking-tighter text-white">EnterpriseHub</h2>
               </div>
 
-              <h1 className="text-white tracking-tight text-3xl font-bold leading-tight text-center pb-6">Welcome Back</h1>
+              <h1 className="text-white tracking-tight text-3xl font-bold leading-tight text-center pb-6">Dashboard Gateway</h1>
 
               <form onSubmit={submit} className="flex w-full flex-col gap-4 px-0 py-3">
                 <label className="flex flex-col w-full">
@@ -133,27 +260,50 @@ export default function LoginPage() {
                 </label>
 
                 <label className="flex flex-col w-full">
-  <p className="text-white text-sm font-semibold leading-normal pb-2">
-    Password
-  </p>
+                  <p className="text-white text-sm font-semibold leading-normal pb-2">
+                    Password
+                  </p>
 
-  <div className="relative flex w-full items-center">
-     <input
-      className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-white/20 bg-white/10 focus:border-primary h-12 placeholder:text-gray-400 pl-4 pr-10 py-2 text-base font-semibold leading-normal"
-      placeholder="Enter your password"
-      type="password"
-      value={password}
-      onChange={(e) => setPassword(e.target.value)}
-      required
-    />
-  </div>
-</label>
-  <div className="flex flex-col items-stretch px-0 pt-4 pb-3">
-     <button type="submit" className="glass-button">
-      Log In
-      </button>
-    </div>
-    </form>
+                  <div className="relative flex w-full items-center">
+                    <input
+                      className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-white/20 bg-white/10 focus:border-primary h-12 placeholder:text-gray-400 pl-4 pr-12 py-2 text-base font-semibold leading-normal"
+                      placeholder="Enter your password"
+                      type={showPassword ? "text" : "password"}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      onKeyDown={handlePasswordKeyEvent}
+                      onKeyUp={handlePasswordKeyEvent}
+                      required
+                    />
+                    
+                    {/* ANIMATED WAND TOGGLE (Pure JS + CSS) */}
+                    <button
+                      type="button"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors p-1 hover:bg-white/10 rounded-full"
+                      aria-label="Toggle password visibility"
+                    >
+                      <Wand 
+                        stroke={showPassword ? "#fbbf24" : "#ffffff"} 
+                        onClick={() => setShowPassword(!showPassword)}
+                      />
+                    </button>
+                  </div>
+                  
+                  {/* Caps Lock Warning */}
+                  {capsLockOn && (
+                    <div className="mt-2 p-3 bg-white/10 border border-yellow-400/30 rounded-lg backdrop-blur-sm flex items-center gap-2 text-yellow-300 text-xs font-medium">
+                      <span className="material-symbols-outlined text-xs" style={{ fontVariationSettings: "'FILL' 1" }}>warning</span>
+                      Caps Lock is ON
+                    </div>
+                  )}
+                </label>
+
+                <div className="flex flex-col items-stretch px-0 pt-4 pb-3">
+                  <button type="submit" className="glass-button">
+                    Log In
+                  </button>
+                </div>
+              </form>
 
               {err && <p className="text-sm text-red-400 text-center">{err}</p>}
 

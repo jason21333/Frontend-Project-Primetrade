@@ -44,7 +44,6 @@ export default function RegisterPage() {
         try { vantaRef.current.destroy() } catch (e) {}
         vantaRef.current = null
       }
-      const isDark = document.documentElement.classList.contains('dark')
       vantaRef.current = window.VANTA.DOTS({
         el: containerRef.current,
         mouseControls: true,
@@ -55,8 +54,8 @@ export default function RegisterPage() {
         scale: 1.0,
         scaleMobile: 1.0,
         color: 0xff7900,
-        color2: isDark ? 0xff7900 : 0xff7900,
-        backgroundColor: isDark ? 0x101322 : 0xf6f6f8,
+        color2: 0xff7900,
+        backgroundColor: 0x000000,  // ✅ PURE BLACK
         size: 3.5,
         spacing: 35.0,
       })
@@ -90,14 +89,14 @@ export default function RegisterPage() {
   }
 
   return (
-    <div ref={containerRef} id="vanta-bg" className="relative flex min-h-screen w-full flex-col bg-slate-950 dark:bg-slate-950 overflow-x-hidden">
+    <div ref={containerRef} id="vanta-bg" className="relative flex min-h-screen w-full flex-col bg-black overflow-x-hidden">  {/* ✅ PURE BLACK */}
       <div className="relative flex h-full grow flex-col">
         <div className="flex flex-1 items-center justify-center p-4 sm:p-6 md:p-8">
-          <div className="glassmorphism-card register-card w-full max-w-md h-auto p-6 sm:p-8">
+          <div className="glassmorphism-card register-card w-full max-w-md h-auto p-6 sm:p-8 bg-black/30">  {/* ✅ BLACK GLASS */}
             <div className="card-content">
               <div className="flex items-center justify-center gap-2 pb-6">
-                <span className="material-symbols-outlined text-primary text-4xl">hexagon</span>
-                <h2 className="text-2xl font-bold tracking-tighter text-white">AETHER</h2>
+                <span className="material-symbols-outlined text-primary text-4xl">CRYPTO</span>
+                <h2 className="text-2xl font-bold tracking-tighter text-white">EnterpriseHub</h2>
               </div>
 
               <h1 className="text-white tracking-tight text-3xl font-bold leading-tight text-center pb-2">Create Account</h1>
