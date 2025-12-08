@@ -343,7 +343,7 @@ export default function DashboardPage() {
               <div className="h-80 bg-gradient-to-br from-green-900/40 via-blue-900/30 to-purple-900/40 rounded-2xl flex items-center justify-center border-2 border-green-400/30 shadow-2xl">
                 <div className="text-center">
                   <span className="material-symbols-outlined text-6xl text-green-400 mb-4 animate-pulse">trending_up</span>
-                  <p className="text-2xl font-bold text-white/80">Dynamic Chart</p>
+                  <p className="text-2xl font-bold text-white/80">chart</p>
                   <p className="text-lg text-green-400 mt-2">Loading analytics...</p>
                 </div>
               </div>
