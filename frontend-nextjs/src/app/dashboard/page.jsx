@@ -38,84 +38,96 @@ export default function DashboardPage() {
     return () => clearInterval(interval)
   }, [])
 
-  // ✅ CDN Vanta Waves FULL BACKGROUND (SSR-safe, no npm needed)
+  // ✅ FIXED Vanta Waves - Works 100% with Next.js 15+
   useEffect(() => {
     if (typeof window === 'undefined' || !backgroundRef.current || scriptsLoaded.current) return
 
-    const initVantaCDN = async () => {
+    let vantaEffect;
+
+    const initVanta = async () => {
       try {
-        console.log('🔄 Initializing CDN Vanta background...')
+        console.log('🔄 Initializing Vanta background...')
         
-        // Load Three.js r121 (from your attachment)
+        // Clean up first
+        if (vantaEffect) {
+          vantaEffect.destroy();
+        }
+
+        // Load scripts only once
         if (!window.THREE) {
-          const threeScript = document.createElement('script')
-          threeScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r121/three.min.js'
-          threeScript.async = true
-          document.head.appendChild(threeScript)
-          await new Promise(resolve => threeScript.onload = () => {
-            console.log('✅ Three.js loaded')
-            resolve()
-          })
+          await new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
+            script.onload = () => {
+              console.log('✅ Three.js r128 loaded');
+              resolve();
+            };
+            script.onerror = reject;
+            document.head.appendChild(script);
+          });
         }
 
-        // Load Vanta Waves
         if (!window.VANTA?.WAVES) {
-          const vantaScript = document.createElement('script')
-          vantaScript.src = 'https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.waves.min.js'
-          vantaScript.async = true
-          document.head.appendChild(vantaScript)
-          await new Promise(resolve => vantaScript.onload = () => {
-            console.log('✅ Vanta Waves loaded')
-            resolve()
-          })
+          await new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = 'https://cdn.jsdelivr.net/npm/vanta@1.7.2/dist/vanta.waves.min.js?v=20231208';
+            script.onload = () => {
+              console.log('✅ Vanta Waves loaded');
+              resolve();
+            };
+            script.onerror = reject;
+            document.head.appendChild(script);
+          });
         }
 
-        // Wait for everything to be ready
-        await new Promise(resolve => setTimeout(resolve, 200))
+        // Small delay for DOM readiness
+        await new Promise(resolve => setTimeout(resolve, 100));
 
-        // Destroy existing instance first
-        if (vantaRef.current) {
-          vantaRef.current.destroy()
-          console.log('🧹 Destroyed previous Vanta instance')
-        }
-        
-        // ✅ Initialize FULL SCREEN Vanta Waves
-        if (window.VANTA && window.THREE && backgroundRef.current) {
-          vantaRef.current = window.VANTA.WAVES({
+        // Initialize Vanta
+        if (window.VANTA?.WAVES && window.THREE && backgroundRef.current) {
+          vantaEffect = window.VANTA.WAVES({
             el: backgroundRef.current,
             THREE: window.THREE,
             mouseControls: true,
             touchControls: true,
             gyroControls: false,
-            minHeight: 1.00,      // Full viewport height
-            minWidth: 1.00,       // Full viewport width
-            scale: 1.00,
-            scaleMobile: 1.00,
-            color: 0x1b481f,      // Green waves
-            backgroundColor: 0x000000, // Black background
-            shininess: 30.00,
-            waveSpeed: 0.65,
-            waveHeight: 10.00
-          })
+            minHeight: 1.0,
+            minWidth: 1.0,
+            scale: 1.0,
+            scaleMobile: 1.0,
+            color: 0x10ff00,        // Bright green waves
+            backgroundColor: 0x0a0a0a, // Dark black
+            shininess: 50,
+            waveSpeed: 0.75,
+            waveHeight: 15,
+            zoom: 0.65
+          });
           
-          scriptsLoaded.current = true
-          console.log('🎉 Vanta Waves FULL BACKGROUND ACTIVE!')
+          vantaRef.current = vantaEffect;
+          scriptsLoaded.current = true;
+          console.log('🎉 Vanta background ACTIVE!');
         }
       } catch (error) {
-        console.error('❌ CDN Vanta failed:', error)
+        console.error('❌ Vanta init failed:', error);
       }
-    }
+    };
 
-    const timeoutId = setTimeout(initVantaCDN, 300)
+    // Initialize after short delay
+    const timeout = setTimeout(initVanta, 500);
+
     return () => {
-      clearTimeout(timeoutId)
-      if (vantaRef.current) {
-        vantaRef.current.destroy()
-        vantaRef.current = null
-        scriptsLoaded.current = false
+      clearTimeout(timeout);
+      if (vantaEffect) {
+        vantaEffect.destroy();
+        vantaEffect = null;
       }
-    }
-  }, [])
+      if (vantaRef.current) {
+        vantaRef.current.destroy();
+        vantaRef.current = null;
+      }
+      scriptsLoaded.current = false;
+    };
+  }, []);
 
   // Fetch user and entities
   useEffect(() => {
@@ -232,17 +244,26 @@ export default function DashboardPage() {
 
   return (
     <>
-      {/* 🌊 Vanta Waves FULL BACKGROUND CONTAINER */}
+      {/* 🌊 Vanta Waves FULL BACKGROUND - FIXED */}
       <div 
         ref={backgroundRef}
         className="fixed inset-0 z-0 pointer-events-none"
-        id="vanta-background"
+        id="vanta-bg"
         style={{ 
           width: '100vw', 
           height: '100vh',
-          position: 'fixed'
+          position: 'fixed',
+          top: 0,
+          left: 0
         }}
       />
+      
+      {/* Debug info - REMOVE IN PRODUCTION */}
+      {process.env.NODE_ENV === 'development' && (
+        <div className="fixed top-4 left-4 z-50 bg-red-500/90 text-white p-2 rounded text-sm">
+          Vanta Ref: {backgroundRef.current ? '✅' : '❌'} | Scripts: {scriptsLoaded.current ? '✅' : '❌'}
+        </div>
+      )}
       
       {/* Glassmorphism Content Layer */}
       <div className="relative z-10 flex min-h-screen bg-black/75 backdrop-blur-sm text-white">
@@ -343,7 +364,7 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* Manage Entities */}
+          {/* Manage Entities - ICON BUTTONS */}
           <div className="bg-black/60 backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl overflow-hidden">
             <div className="p-8 border-b border-white/10">
               <div className="flex flex-wrap justify-between items-center gap-6">
@@ -355,32 +376,77 @@ export default function DashboardPage() {
                   <p className="text-xl text-white/60 mt-2">{entities.length} entities</p>
                 </div>
                 <div className="flex items-center gap-4 flex-wrap">
-                  <div className="relative w-72">
+                  {/* 🔍 Search Icon Button */}
+                  <div className="relative group w-72">
                     <input 
-                      className="w-full h-14 pl-12 pr-12 text-lg bg-black/50 backdrop-blur-xl border border-white/20 rounded-2xl focus:ring-4 focus:ring-green-500/30 focus:outline-none placeholder:text-white/50 text-white shadow-xl transition-all"
+                      className="w-full h-14 pl-14 pr-4 text-lg bg-black/50 backdrop-blur-xl border border-white/20 rounded-2xl focus:ring-4 focus:ring-green-500/30 focus:outline-none placeholder:text-white/50 text-white shadow-xl transition-all group-hover:border-green-400/50"
                       placeholder="Search entities..." 
                       type="text"
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                     />
-                    <span className="material-symbols-outlined absolute left-5 top-1/2 -translate-y-1/2 text-green-400 text-xl">search</span>
+                    <button
+                      type="button"
+                      className="absolute left-4 top-1/2 -translate-y-1/2 p-2 text-green-400 hover:text-green-300 hover:bg-green-500/20 rounded-xl transition-all duration-200 group-hover:scale-110 shadow-lg hover:shadow-xl"
+                      aria-label="Search"
+                    >
+                      <span className="material-symbols-outlined text-xl group-hover:scale-110 transition-transform">search</span>
+                    </button>
+                    
+                    {/* Clear Search Button */}
+                    {searchTerm && (
+                      <button
+                        type="button"
+                        onClick={() => setSearchTerm('')}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 p-2 text-white/60 hover:text-red-400 hover:bg-red-500/20 rounded-xl transition-all duration-200 hover:scale-110 shadow-lg hover:shadow-xl"
+                        aria-label="Clear search"
+                      >
+                        <span className="material-symbols-outlined text-xl">close</span>
+                      </button>
+                    )}
                   </div>
-                  <select 
-                    className="h-14 px-6 text-lg bg-black/50 backdrop-blur-xl border border-white/20 rounded-2xl text-white/90 hover:bg-white/10 pr-10 cursor-pointer shadow-xl transition-all"
-                    value={statusFilter} 
-                    onChange={(e) => setStatusFilter(e.target.value)}
-                  >
-                    <option>All Status</option>
-                    <option>Active</option>
-                    <option>Pending</option>
-                    <option>Inactive</option>
-                  </select>
+
+                  {/* ⏳ Filter Icon Button */}
+                  <div className="relative group">
+                    <button
+                      type="button"
+                      onClick={() => document.getElementById('status-filter').focus()}
+                      className="flex items-center gap-3 h-14 px-6 bg-black/50 backdrop-blur-xl border border-white/20 rounded-2xl text-white/90 hover:bg-white/10 hover:border-green-400/50 hover:scale-[1.02] shadow-xl transition-all duration-200 pr-10"
+                    >
+                      <span className="material-symbols-outlined text-xl transition-transform group-hover:scale-110">filter_list</span>
+                      <span className="font-semibold capitalize">{statusFilter === 'All' ? 'All Status' : statusFilter}</span>
+                      <span className="material-symbols-outlined text-lg ml-auto text-white/60 group-hover:text-white/80 transition-all">arrow_drop_down</span>
+                    </button>
+                    
+                    <select 
+                      id="status-filter"
+                      className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"
+                      value={statusFilter} 
+                      onChange={(e) => setStatusFilter(e.target.value)}
+                    >
+                      <option>All Status</option>
+                      <option>Active</option>
+                      <option>Pending</option>
+                      <option>Inactive</option>
+                    </select>
+                  </div>
+
+                  {/* ➕ Add New Icon Button */}
                   <button 
                     onClick={openCreateModal}
-                    className="flex items-center justify-center gap-3 h-14 px-8 bg-gradient-to-r from-green-600 to-emerald-600 text-white text-lg font-black rounded-2xl hover:from-green-500 hover:to-emerald-500 shadow-2xl hover:shadow-3xl hover:scale-[1.02] transition-all duration-200"
+                    className="flex items-center justify-center size-14 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white shadow-2xl hover:shadow-3xl hover:scale-[1.05] transition-all duration-200 rounded-3xl border-2 border-green-500/50 backdrop-blur-xl"
+                    aria-label="Add new entity"
                   >
-                    <span className="material-symbols-outlined text-2xl" style={{ fontVariationSettings: "'wght' 600" }}>add</span>
-                    Add New
+                    <span className="material-symbols-outlined text-2xl font-bold" style={{ fontVariationSettings: "'wght' 700" }}>add</span>
+                  </button>
+
+                  {/* 🔄 Refresh Button */}
+                  <button 
+                    onClick={() => window.location.reload()}
+                    className="flex items-center justify-center size-14 p-3 bg-white/10 hover:bg-white/20 hover:scale-110 text-white/80 hover:text-white backdrop-blur-xl rounded-3xl border border-white/20 shadow-xl hover:shadow-2xl transition-all duration-200"
+                    aria-label="Refresh data"
+                  >
+                    <span className="material-symbols-outlined text-xl rotate-0 hover:rotate-180 transition-transform duration-500">refresh</span>
                   </button>
                 </div>
               </div>
