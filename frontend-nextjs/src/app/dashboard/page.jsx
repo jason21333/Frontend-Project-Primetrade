@@ -17,11 +17,10 @@ export default function DashboardPage() {
   const [editingEntity, setEditingEntity] = useState(null)
   const [formData, setFormData] = useState({ name: '', owner: '', status: 'Pending' })
 
-  // Vanta (same style as register page)
   const containerRef = useRef(null)
   const vantaRef = useRef(null)
 
-  // Update time every minute
+  // Time
   useEffect(() => {
     const updateTime = () => {
       const now = new Date()
@@ -37,10 +36,11 @@ export default function DashboardPage() {
     return () => clearInterval(interval)
   }, [])
 
-  // Vanta Waves using your CDN config
+  // Vanta Waves
   useEffect(() => {
     let threeScript = null
     let vantaScript = null
+    let timeoutId = null
 
     const loadThree = () =>
       new Promise((resolve) => {
@@ -69,7 +69,7 @@ export default function DashboardPage() {
         vantaRef.current = null
       }
       vantaRef.current = window.VANTA.WAVES({
-        el: '#vanta-bg',          // ✅ match container id
+        el: '#vanta-bg',
         mouseControls: true,
         touchControls: true,
         gyroControls: false,
@@ -77,17 +77,21 @@ export default function DashboardPage() {
         minWidth: 200.0,
         scale: 1.0,
         scaleMobile: 1.0,
-        color: 0x272f27,          // ✅ your color
-        backgroundColor: 0x000000 // pure black background
+        color: 0x272f27,
+        backgroundColor: 0x000000,
       })
     }
 
     loadThree()
       .then(loadVanta)
-      .then(initVanta)
+      .then(() => {
+        initVanta()
+        timeoutId = setTimeout(initVanta, 500)
+      })
       .catch(() => {})
 
     return () => {
+      if (timeoutId) clearTimeout(timeoutId)
       if (vantaRef.current && typeof vantaRef.current.destroy === 'function') {
         vantaRef.current.destroy()
         vantaRef.current = null
@@ -219,17 +223,27 @@ export default function DashboardPage() {
       <div className="relative flex h-full grow flex-col">
         <div className="flex flex-1 items-stretch justify-center p-4 sm:p-6 md:p-8">
           <main className="flex-1 max-w-6xl mx-auto text-white">
-            {/* Header */}
+            {/* Header with Button Navigation */}
             <header className="flex flex-wrap items-center justify-between gap-4 mb-6">
-              <nav className="flex items-center gap-2 p-2 bg-black/80 backdrop-blur-md border border-white/10 rounded-2xl shadow-lg">
-                <div className="flex items-center justify-center p-2 bg-gradient-to-r from-green-400 to-emerald-400 rounded-xl w-8 h-8 shadow-md">
-                  <span className="material-symbols-outlined text-black text-base font-bold">
-                    data_usage
-                  </span>
+              <nav className="flex items-center gap-2">
+                {/* Dashboard Button */}
+                <button className="flex items-center justify-center p-3 bg-black/80 backdrop-blur-md border border-white/10 rounded-2xl shadow-lg hover:bg-white/5 hover:border-green-400/50 hover:scale-105 transition-all">
+                  <div className="flex items-center justify-center p-2 bg-gradient-to-r from-green-400 to-emerald-400 rounded-xl w-10 h-10 shadow-md">
+                    <span className="material-symbols-outlined text-black text-lg font-bold">
+                      dashboard
+                    </span>
+                  </div>
+                </button>
+
+                {/* Quick Action Buttons */}
+                <div className="flex items-center gap-2 ml-2">
+                  <button className="p-2 text-white/70 hover:text-green-400 hover:bg-white/10 rounded-xl transition-all hover:scale-110" aria-label="Analytics">
+                    <span className="material-symbols-outlined text-lg">analytics</span>
+                  </button>
+                  <button className="p-2 text-white/70 hover:text-blue-400 hover:bg-white/10 rounded-xl transition-all hover:scale-110" aria-label="Settings">
+                    <span className="material-symbols-outlined text-lg">settings</span>
+                  </button>
                 </div>
-                <span className="px-3 py-1 text-xs font-semibold rounded-lg text-white/90 bg-white/10 backdrop-blur-sm">
-                  Dashboard
-                </span>
               </nav>
 
               <div className="flex items-center gap-3">
@@ -247,37 +261,54 @@ export default function DashboardPage() {
                 </div>
                 <button 
                   onClick={logout}
-                  className="flex items-center gap-1 px-3 py-2 rounded-xl text-xs text-white/80 hover:bg-white/10 backdrop-blur-md transition-all hover:scale-105 shadow-md border border-white/10"
+                  className="flex items-center justify-center w-11 h-11 p-2 rounded-2xl text-white/80 hover:bg-red-500/20 hover:text-red-300 backdrop-blur-md transition-all hover:scale-110 shadow-md border border-white/10 hover:border-red-400/50"
                   aria-label="Logout"
                 >
-                  <span className="material-symbols-outlined text-sm">logout</span>
+                  <span className="material-symbols-outlined text-lg font-bold">logout</span>
                 </button>
               </div>
             </header>
 
             {/* User Profile Card */}
             <div className="p-6 bg-black/60 backdrop-blur-xl border border-white/10 rounded-2xl mb-6 shadow-lg">
-              <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                <span className="material-symbols-outlined text-2xl text-green-400">person</span>
-                User Profile
-              </h2>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold text-white flex items-center gap-2">
+                  <span className="material-symbols-outlined text-2xl text-green-400">person</span>
+                  Profile
+                </h2>
+                <button className="p-2 hover:bg-white/10 rounded-xl transition-all" aria-label="Edit profile">
+                  <span className="material-symbols-outlined text-lg">edit</span>
+                </button>
+              </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
                 <div className="space-y-1">
-                  <p className="text-xs text-white/60">Name</p>
+                  <p className="text-xs text-white/60 flex items-center gap-1">
+                    <span className="material-symbols-outlined text-sm">person</span>
+                    Name
+                  </p>
                   <p className="font-semibold text-white">{user?.name || 'N/A'}</p>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-xs text-white/60">Email</p>
+                  <p className="text-xs text-white/60 flex items-center gap-1">
+                    <span className="material-symbols-outlined text-sm">email</span>
+                    Email
+                  </p>
                   <p className="font-semibold text-white break-all">{user?.email || 'N/A'}</p>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-xs text-white/60">User ID</p>
+                  <p className="text-xs text-white/60 flex items-center gap-1">
+                    <span className="material-symbols-outlined text-sm">key</span>
+                    User ID
+                  </p>
                   <p className="text-[11px] font-mono text-green-300 bg-green-900/30 px-2 py-1 rounded-lg">
                     {user?._id?.slice(-8).toUpperCase() || 'N/A'}
                   </p>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-xs text-white/60">Member Since</p>
+                  <p className="text-xs text-white/60 flex items-center gap-1">
+                    <span className="material-symbols-outlined text-sm">calendar_today</span>
+                    Since
+                  </p>
                   <p className="font-semibold text-white text-sm">
                     {user?.createdAt ? formatDate(user.createdAt) : 'N/A'}
                   </p>
@@ -292,9 +323,9 @@ export default function DashboardPage() {
                   <div>
                     <h1 className="text-2xl font-bold text-white flex items-center gap-2">
                       <span className="material-symbols-outlined text-3xl text-green-400">inventory_2</span>
-                      Manage Entities
+                      Entities
                     </h1>
-                    <p className="text-sm text-white/60 mt-1">{entities.length} entities</p>
+                    <p className="text-sm text-white/60 mt-1">{entities.length} total</p>
                   </div>
                   <div className="flex items-center gap-3 flex-wrap">
                     {/* Search */}
@@ -327,55 +358,35 @@ export default function DashboardPage() {
                       )}
                     </div>
 
-                    {/* Filter */}
-                    <div className="relative group">
-                      <button
-                        type="button"
-                        onClick={() => document.getElementById('status-filter').focus()}
-                        className="flex items-center gap-2 h-10 px-4 bg-black/50 backdrop-blur-xl border border-white/20 rounded-xl text-xs text-white/90 hover:bg-white/10 hover:border-green-400/50 shadow-md transition-all"
-                      >
-                        <span className="material-symbols-outlined text-sm">filter_list</span>
-                        <span className="font-medium capitalize">
-                          {statusFilter === 'All' ? 'All status' : statusFilter}
-                        </span>
-                        <span className="material-symbols-outlined text-sm ml-1 text-white/60">arrow_drop_down</span>
-                      </button>
-                      <select 
-                        id="status-filter"
-                        name="statusFilter"
-                        className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"
-                        value={statusFilter} 
-                        onChange={(e) => {
-                          const value = e.target.value
-                          setStatusFilter(value === 'All Status' ? 'All' : value)
-                        }}
-                      >
-                        <option>All Status</option>
-                        <option>Active</option>
-                        <option>Pending</option>
-                        <option>Inactive</option>
-                      </select>
-                    </div>
-
-                    {/* Add New */}
-                    <button 
-                      onClick={openCreateModal}
-                      className="flex items-center justify-center w-10 h-10 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white shadow-md hover:shadow-lg hover:scale-105 transition-all rounded-xl border border-green-500/50"
-                      aria-label="Add new entity"
+                    {/* Filter Button */}
+                    <button
+                      type="button"
+                      onClick={() => document.getElementById('status-filter').focus()}
+                      className="flex items-center gap-2 h-10 px-4 bg-black/50 backdrop-blur-xl border border-white/20 rounded-xl text-white/90 hover:bg-white/10 hover:border-green-400/50 shadow-md transition-all hover:scale-[1.02]"
                     >
-                      <span className="material-symbols-outlined text-base font-bold">add</span>
-                    </button>
-
-                    {/* Refresh */}
-                    <button 
-                      onClick={() => window.location.reload()}
-                      className="flex items-center justify-center w-10 h-10 bg-white/10 hover:bg-white/20 text-white/80 hover:text-white backdrop-blur-xl rounded-xl border border-white/20 shadow-md hover:shadow-lg transition-all"
-                      aria-label="Refresh data"
-                    >
-                      <span className="material-symbols-outlined text-base transition-transform duration-500 hover:rotate-180">
-                        refresh
+                      <span className="material-symbols-outlined text-base">filter_list</span>
+                      <span className="text-xs font-medium capitalize">
+                        {statusFilter === 'All' ? 'All' : statusFilter}
                       </span>
                     </button>
+
+                    {/* Action Buttons */}
+                    <div className="flex items-center gap-2">
+                      <button 
+                        onClick={openCreateModal}
+                        className="flex items-center justify-center w-11 h-11 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white shadow-md hover:shadow-lg hover:scale-105 transition-all rounded-xl border border-green-500/50"
+                        aria-label="Add new entity"
+                      >
+                        <span className="material-symbols-outlined text-lg font-bold">add</span>
+                      </button>
+                      <button 
+                        onClick={() => window.location.reload()}
+                        className="flex items-center justify-center w-11 h-11 bg-white/10 hover:bg-white/20 text-white/80 hover:text-white backdrop-blur-xl rounded-xl border border-white/20 shadow-md hover:shadow-lg transition-all hover:rotate-180"
+                        aria-label="Refresh data"
+                      >
+                        <span className="material-symbols-outlined text-lg font-bold">refresh</span>
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -391,12 +402,12 @@ export default function DashboardPage() {
                 <table className="w-full text-left text-sm">
                   <thead className="bg-black/40 backdrop-blur-sm">
                     <tr>
-                      <th className="px-6 py-3 font-semibold text-white/90">ID</th>
-                      <th className="px-6 py-3 font-semibold text-white/90">Entity Name</th>
+                      <th className="px-6 py-3 font-semibold text-white/90 w-20">ID</th>
+                      <th className="px-6 py-3 font-semibold text-white/90">Name</th>
                       <th className="px-6 py-3 font-semibold text-white/90">Owner</th>
-                      <th className="px-6 py-3 font-semibold text-white/90">Status</th>
-                      <th className="px-6 py-3 font-semibold text-white/90">Date Created</th>
-                      <th className="px-6 py-3 font-semibold text-white/90 text-right">Actions</th>
+                      <th className="px-6 py-3 font-semibold text-white/90 w-24">Status</th>
+                      <th className="px-6 py-3 font-semibold text-white/90 w-32">Created</th>
+                      <th className="px-6 py-3 font-semibold text-white/90 text-right w-20">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -406,47 +417,57 @@ export default function DashboardPage() {
                           <span className="material-symbols-outlined text-5xl text-white/20 mb-3 block">
                             inventory_2
                           </span>
-                          <p className="text-base font-semibold mb-1">No entities found</p>
-                          <p className="text-xs">Create your first entity to get started.</p>
+                          <p className="text-base font-semibold mb-1">No entities</p>
+                          <button 
+                            onClick={openCreateModal}
+                            className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white rounded-xl text-sm font-semibold shadow-md hover:shadow-lg transition-all"
+                          >
+                            <span className="material-symbols-outlined">add</span>
+                            Create first
+                          </button>
                         </td>
                       </tr>
                     ) : (
                       entities.map((entity) => (
-                        <tr key={entity._id} className="border-t border-white/10 hover:bg:white/5 transition-all">
+                        <tr key={entity._id} className="border-t border-white/10 hover:bg-white/5 transition-all">
                           <td className="px-6 py-3 font-mono text-xs text-green-400 font-semibold">
                             {entity._id.slice(-8).toUpperCase()}
                           </td>
                           <td className="px-6 py-3">
-                            <div className="font-semibold text-sm text-white">
+                            <div className="font-semibold text-sm text-white flex items-center gap-2">
+                              <span className="material-symbols-outlined text-base text-white/50">label</span>
                               {entity.name}
                             </div>
                           </td>
-                          <td className="px-6 py-3 text-sm text-white/90">
+                          <td className="px-6 py-3 text-sm text-white/90 flex items-center gap-2">
+                            <span className="material-symbols-outlined text-sm text-white/50">person</span>
                             {entity.owner}
                           </td>
                           <td className="px-6 py-3">
                             <span className={`inline-flex items-center px-3 py-1 rounded-xl text-xs font-semibold border ${getStatusBadge(entity.status)}`}>
+                              <span className="w-2 h-2 rounded-full bg-current mr-1"></span>
                               {entity.status}
                             </span>
                           </td>
-                          <td className="px-6 py-3 text-xs text-white/70">
+                          <td className="px-6 py-3 text-xs text-white/70 flex items-center gap-2">
+                            <span className="material-symbols-outlined text-sm text-white/40">calendar_today</span>
                             {formatDate(entity.createdAt)}
                           </td>
                           <td className="px-6 py-3 text-right">
-                            <div className="flex gap-2 justify-end">
+                            <div className="flex gap-1.5 justify-end">
                               <button 
                                 onClick={() => openEditModal(entity)}
-                                className="p-2 hover:bg-green-500/20 hover:text-green-400 rounded-xl border border-green-500/30 transition-all text-xs" 
-                                aria-label="Edit"
+                                className="flex items-center justify-center w-9 h-9 hover:bg-green-500/20 hover:text-green-400 rounded-xl border border-green-500/30 transition-all hover:scale-105 shadow-md text-sm" 
+                                aria-label="Edit entity"
                               >
-                                <span className="material-symbols-outlined text-base">edit</span>
+                                <span className="material-symbols-outlined text-lg font-bold">edit</span>
                               </button>
                               <button 
                                 onClick={() => handleDelete(entity._id)}
-                                className="p-2 hover:bg-red-500/20 hover:text-red-400 rounded-xl border border-red-500/30 transition-all text-xs" 
-                                aria-label="Delete"
+                                className="flex items-center justify-center w-9 h-9 hover:bg-red-500/20 hover:text-red-400 rounded-xl border border-red-500/30 transition-all hover:scale-105 shadow-md text-sm" 
+                                aria-label="Delete entity"
                               >
-                                <span className="material-symbols-outlined text-base">delete</span>
+                                <span className="material-symbols-outlined text-lg font-bold">delete</span>
                               </button>
                             </div>
                           </td>
@@ -466,39 +487,39 @@ export default function DashboardPage() {
         <div className="fixed inset-0 bg-black/90 backdrop-blur-2xl flex items-center justify-center z-50 p-4">
           <div className="bg-black/80 backdrop-blur-3xl border border-white/20 rounded-2xl p-6 w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto text-sm">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-bold text:white">
-                {editingEntity ? 'Edit Entity' : 'Create New Entity'}
+              <h2 className="text-lg font-bold text-white flex items-center gap-2">
+                <span className="material-symbols-outlined text-xl text-green-400">
+                  {editingEntity ? 'edit' : 'add'}
+                </span>
+                {editingEntity ? 'Edit Entity' : 'New Entity'}
               </h2>
               <button 
                 onClick={closeModal}
-                className="p-2 hover:bg-white/10 rounded-xl transition-all"
+                className="p-2 hover:bg-white/10 rounded-xl transition-all hover:scale-110"
+                aria-label="Close"
               >
                 <span className="material-symbols-outlined text-xl">close</span>
               </button>
             </div>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label
-                  htmlFor="entity-name"
-                  className="block text-xs font-semibold text-white mb-2"
-                >
-                  Entity Name
+                <label className="flex items-center gap-2 text-xs font-semibold text-white mb-2">
+                  <span className="material-symbols-outlined text-sm">label</span>
+                  Name
                 </label>
                 <input 
                   id="entity-name"
                   name="entityName"
                   type="text" 
                   required 
-                  className="w-full h-10 px-3 text-sm bg-black/40 backdrop-blur-xl border border-white/20 rounded-xl focus:ring-2 focus:ring-green-500/40 focus:outline-none text-white shadow-md transition-all" 
+                  className="w-full h-10 pl-9 text-sm bg-black/40 backdrop-blur-xl border border-white/20 rounded-xl focus:ring-2 focus:ring-green-500/40 focus:outline-none text-white shadow-md transition-all" 
                   value={formData.name} 
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })} 
                 />
               </div>
               <div>
-                <label
-                  htmlFor="entity-owner"
-                  className="block text-xs font-semibold text-white mb-2"
-                >
+                <label className="flex items-center gap-2 text-xs font-semibold text-white mb-2">
+                  <span className="material-symbols-outlined text-sm">person</span>
                   Owner
                 </label>
                 <input 
@@ -506,22 +527,20 @@ export default function DashboardPage() {
                   name="entityOwner"
                   type="text" 
                   required 
-                  className="w-full h-10 px-3 text-sm bg-black/40 backdrop-blur-xl border border-white/20 rounded-xl focus:ring-2 focus:ring-green-500/40 focus:outline-none text:white shadow-md transition-all" 
+                  className="w-full h-10 pl-9 text-sm bg-black/40 backdrop-blur-xl border border-white/20 rounded-xl focus:ring-2 focus:ring-green-500/40 focus:outline-none text-white shadow-md transition-all" 
                   value={formData.owner} 
                   onChange={(e) => setFormData({ ...formData, owner: e.target.value })} 
                 />
               </div>
               <div>
-                <label
-                  htmlFor="entity-status"
-                  className="block text-xs font-semibold text:white mb-2"
-                >
+                <label className="flex items-center gap-2 text-xs font-semibold text-white mb-2">
+                  <span className="material-symbols-outlined text-sm">toggle_on</span>
                   Status
                 </label>
                 <select 
                   id="entity-status"
                   name="entityStatus"
-                  className="w-full h-10 px-3 text-sm bg-black/40 backdrop-blur-xl border border-white/20 rounded-xl focus:ring-2 focus:ring-green-500/40 focus:outline-none text:white shadow-md transition-all" 
+                  className="w-full h-10 pl-9 text-sm bg-black/40 backdrop-blur-xl border border-white/20 rounded-xl focus:ring-2 focus:ring-green-500/40 focus:outline-none text-white shadow-md transition-all" 
                   value={formData.status} 
                   onChange={(e) => setFormData({ ...formData, status: e.target.value })}
                 >
@@ -534,15 +553,19 @@ export default function DashboardPage() {
                 <button 
                   type="button" 
                   onClick={closeModal}
-                  className="flex-1 h-10 px-4 rounded-xl border border-white/30 text-xs font-semibold text-white/80 hover:border:white/50 hover:bg:white/10 backdrop-blur-xl transition-all"
+                  className="flex items-center justify-center gap-2 flex-1 h-11 rounded-xl border border-white/30 text-xs font-semibold text-white/80 hover:border-white/50 hover:bg-white/10 backdrop-blur-xl transition-all hover:scale-[1.02]"
                 >
+                  <span className="material-symbols-outlined text-base">close</span>
                   Cancel
                 </button>
                 <button 
                   type="submit"
-                  className="flex-1 h-10 px-4 rounded-xl bg-gradient-to-r from-green-600 to-emerald-600 text-xs font-bold text-white hover:from-green-500 hover:to-emerald-500 shadow-md hover:shadow-lg transition-all"
+                  className="flex items-center justify-center gap-2 flex-1 h-11 rounded-xl bg-gradient-to-r from-green-600 to-emerald-600 text-xs font-bold text-white hover:from-green-500 hover:to-emerald-500 shadow-md hover:shadow-lg transition-all hover:scale-[1.02]"
                 >
-                  {editingEntity ? 'Update Entity' : 'Create Entity'}
+                  <span className="material-symbols-outlined text-base font-bold">
+                    {editingEntity ? 'save' : 'add'}
+                  </span>
+                  {editingEntity ? 'Update' : 'Create'}
                 </button>
               </div>
             </form>
