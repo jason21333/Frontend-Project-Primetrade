@@ -259,12 +259,13 @@ export default function DashboardPage() {
                     }}
                   />
                 </div>
+                {/* UPDATED: PNG logout icon */}
                 <button 
                   onClick={logout}
-                  className="flex items-center justify-center w-11 h-11 p-2 rounded-2xl text-white/80 hover:bg-red-500/20 hover:text-red-300 backdrop-blur-md transition-all hover:scale-110 shadow-md border border-white/10 hover:border-red-400/50"
+                  className="flex items-center justify-center w-11 h-11 rounded-2xl bg-white/5 hover:bg-white/10 backdrop-blur-md transition-all hover:scale-110 shadow-md border border-white/10"
                   aria-label="Logout"
                 >
-                  <span className="material-symbols-outlined text-lg font-bold">logout</span>
+                  <span className="material-symbols-outlined text-lg text-white">logout</span>
                 </button>
               </div>
             </header>
@@ -553,7 +554,7 @@ export default function DashboardPage() {
                 <button 
                   type="button" 
                   onClick={closeModal}
-                  className="flex items-center justify-center gap-2 flex-1 h-11 rounded-xl border border-white/30 text-xs font-semibold text-white/80 hover:border-white/50 hover:bg-white/10 backdrop-blur-xl transition-all hover:scale-[1.02]"
+                  className="flex items-center justify-center gap-2 flex-1 h-11 rounded-xl border border-white/30 text-xs font-semibold text-white/80 hover:border-white/50 hover:bg白/10 backdrop-blur-xl transition-all hover:scale-[1.02]"
                 >
                   <span className="material-symbols-outlined text-base">close</span>
                   Cancel
