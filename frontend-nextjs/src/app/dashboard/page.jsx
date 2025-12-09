@@ -218,7 +218,7 @@ export default function DashboardPage() {
     <div
       ref={containerRef}
       id="vanta-bg"
-      className="relative flex min-h-screen w-full flex-col bg-black overflow-x-hidden"
+      className="relative flex min-h-screen w-full flex-col overflow-x-hidden bg-gradient-to-br from-[#0b1a0b] via-[#060b06] to-black"
     >
       <div className="relative flex h-full grow flex-col">
         <div className="flex flex-1 items-stretch justify-center p-4 sm:p-6 md:p-8">
