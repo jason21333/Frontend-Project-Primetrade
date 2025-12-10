@@ -1,267 +1,90 @@
-# MERN App — Scalable Web App with Authentication & Dashboard
+# Primetrade — Next.js + Express + MongoDB
 
-A complete **MERN Stack** project (MongoDB, Express, React, Node.js) with:
-- ✅ User Authentication (Register / Login with JWT)
-- ✅ Protected Dashboard (token-based access)
-- ✅ Scalable Backend API
-- ✅ React Frontend with Vite
-- ✅ Docker & Docker Compose for local development
-- ✅ MongoDB Atlas ready
+Full-stack app with JWT auth, protected dashboard, and entity CRUD. Frontend is Next.js 14 with Tailwind; backend is Express + Mongoose.
 
-## 📁 Project Structure
-
+## Structure
 ```
-mern-app/
-├── backend/                  # Express + Mongoose API
-│   ├── controllers/
-│   ├── models/              # User schema
-│   ├── middleware/          # JWT auth middleware
-│   ├── routes/              # Auth & Dashboard routes
-│   ├── Dockerfile
-│   ├── package.json
-│   ├── server.js
-│   ├── .env.example
-│   └── README.md
-├── frontend/                # Vite + React
-│   ├── src/
-│   │   ├── pages/           # Login, Register, Dashboard
-│   │   ├── main.jsx
-│   │   ├── api.js           # Axios client
-│   │   └── index.css
-│   ├── Dockerfile
-│   ├── package.json
-│   ├── index.html
-│   └── README.md
-├── docker-compose.yml       # Orchestrates all services
-├── .dockerignore
-└── DOCKER.md               # Docker setup guide
+Frontend Project Primetrade/
+├── backend/             # Express API (JWT auth, entities, dashboard)
+├── frontend-nextjs/     # Next.js app (app router)
+├── docker-compose.yml   # Mongo + backend + frontend
+├── DOCKER.md            # Docker-specific guide
 ```
 
-## 🚀 Quick Start with Docker
-
-**Prerequisites:** Docker & Docker Compose installed ([Get Docker](https://docs.docker.com/get-docker/))
-
-### 1. Start All Services
+## Quick Start (Docker)
+Prereq: Docker + Docker Compose.
 
 ```bash
-cd mern-app
-docker-compose up -d --build
+docker-compose up --build
 ```
+Services:
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:5001/api
+- MongoDB: localhost:27017 (volume `mongo-data`)
 
-**Services will be available at:**
-- Frontend: http://localhost:5173
-- Backend API: http://localhost:5000/api
-- MongoDB: localhost:27017 (user: `root`, password: `password`)
-
-### 2. Test the App
-
-1. Open http://localhost:5173 in your browser
-2. Click **Register** and create an account
-3. Login with your credentials
-4. View your protected dashboard
-
-### 3. Stop Services
-
+### Stop
 ```bash
-# Stop but keep data
-docker-compose stop
-
-# Stop and remove containers (keeps volumes)
-docker-compose down
-
-# Stop, remove containers, and delete all data
-docker-compose down -v
+docker-compose down       # remove containers, keep volumes
+docker-compose down -v    # also delete volumes/data
 ```
 
----
-
-## 🛠️ Manual Local Setup (without Docker)
-
-### Backend
-
+## Local Dev (without Docker)
+Backend:
 ```bash
 cd backend
-cp .env.example .env
-
-# Edit .env with your MongoDB URI and JWT_SECRET
-nano .env
-
+cp .env.example .env   # create and edit values
 npm install
-npm run dev
+npm run dev            # http://localhost:5000
 ```
 
-Backend runs on **http://localhost:5000**
-
-### Frontend
-
+Frontend:
 ```bash
-cd frontend
+cd frontend-nextjs
 npm install
-npm run dev
+npm run dev            # http://localhost:3000
+# If backend not on 5000, set NEXT_PUBLIC_API_BASE accordingly
 ```
 
-Frontend runs on **http://localhost:5173**
-
----
-
-## 📚 API Endpoints
-
-### Authentication
-
-- **POST** `/api/auth/register`  
-  Body: `{ name, email, password }`  
-  Response: `{ token, user: { id, name, email } }`
-
-- **POST** `/api/auth/login`  
-  Body: `{ email, password }`  
-  Response: `{ token, user: { id, name, email } }`
-
-### Protected Routes
-
-- **GET** `/api/dashboard`  
-  Headers: `Authorization: Bearer <token>`  
-  Response: `{ message, userId }`
-
----
-
-## 🔑 Environment Variables
-
-### Backend (`.env`)
-
+## Environment Variables
+Backend (`backend/.env`):
 ```
-MONGO_URI=mongodb://localhost:27017/mern_app
-JWT_SECRET=your_secret_key_here
+MONGO_URI=mongodb://localhost:27017/primetrade   # or mongo:27017 in Docker
+JWT_SECRET=replace_me
 PORT=5000
+FRONTEND_URL=http://localhost:3000
+# Optional OAuth:
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+GOOGLE_CALLBACK_URL=
+GITHUB_CLIENT_ID=
+GITHUB_CLIENT_SECRET=
+GITHUB_CALLBACK_URL=
 ```
 
-### Frontend (optional `.env`)
+Frontend (Next.js):
+- `NEXT_PUBLIC_API_BASE` (default: `http://localhost:5000/api`; in Docker compose it is set to `http://localhost:5001/api` for the browser).
 
-```
-VITE_API_BASE=http://localhost:5000/api
-```
+## API Overview
+- `POST /api/auth/register` — `{ name, email, password }` → `{ token, user }`
+- `POST /api/auth/login` — `{ email, password }` → `{ token, user }`
+- `GET /api/dashboard` — auth required, returns user info
+- `GET /api/entities` — list (supports `search`, `status`, `sortBy`, `sortOrder`)
+- `POST /api/entities` — create `{ name, owner, status? }`
+- `PUT /api/entities/:id` — update
+- `DELETE /api/entities/:id` — delete
 
----
+## Frontend Notes
+- Icons: Material Symbols via Google Fonts; logout uses PNG at `public/icons/logout.png`.
+- Background: Vanta waves (three.js + vanta) lazy-loaded; gradient fallback can be added if needed.
+- Auth: JWT stored in `localStorage`; axios interceptor adds `Authorization: Bearer <token>`.
 
-## 🔐 Security Notes
+## Troubleshooting
+- Frontend can’t reach backend: ensure `NEXT_PUBLIC_API_BASE` matches the exposed backend URL (5001 in Docker).
+- Mongo connection: verify `MONGO_URI` (use `mongo` hostname in Docker).
+- Ports busy: adjust `ports` in `docker-compose.yml` and update `NEXT_PUBLIC_API_BASE`.
 
-- **Development:** JWT_SECRET is set to `your_jwt_secret_key_change_in_prod` in docker-compose.yml — change for production
-- **Password Hashing:** Uses bcryptjs with 10 salt rounds
-- **Token Expiry:** JWT tokens expire in 7 days
-- **CORS:** Enabled for localhost
-
----
-
-## 📦 Tech Stack
-
-| Layer | Technology |
-|-------|-----------|
-| **Frontend** | React 18, Vite, Axios, React Router |
-| **Backend** | Express.js, Node.js |
-| **Database** | MongoDB 7, Mongoose |
-| **Authentication** | JWT (jsonwebtoken), bcryptjs |
-| **Deployment** | Docker & Docker Compose |
-
----
-
-## 🚢 Deployment
-
-### Option 1: Heroku + MongoDB Atlas (Recommended)
-
-```bash
-# 1. Create MongoDB Atlas cluster at https://www.mongodb.com/cloud/atlas
-# 2. Copy the connection string
-# 3. Deploy backend to Heroku
-heroku create your-app-name
-heroku config:set MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/mern_app
-heroku config:set JWT_SECRET=your_production_secret
-git push heroku main
-
-# 4. Deploy frontend to Vercel
-npm run build
-# Upload dist/ to Vercel
-```
-
-### Option 2: Docker to Any Cloud (AWS, GCP, Azure, DigitalOcean)
-
-```bash
-# Build and tag
-docker build -t your-registry/mern-app-backend:latest ./backend
-docker build -t your-registry/mern-app-frontend:latest ./frontend
-
-# Push
-docker push your-registry/mern-app-backend:latest
-docker push your-registry/mern-app-frontend:latest
-
-# Deploy with your cloud provider's orchestration (ECS, GKE, ACI, etc.)
-```
-
----
-
-## 📝 Development Workflow
-
-1. **Make changes** in `backend/` or `frontend/`
-2. **Hot reload:** Vite dev server and nodemon will auto-reload
-3. **Commit:** `git add . && git commit -m "your message"`
-4. **Push:** `git push origin main`
-
----
-
-## 🐛 Troubleshooting
-
-| Issue | Solution |
-|-------|----------|
-| Port 5000/5173 already in use | Kill process or change port in docker-compose.yml |
-| MongoDB connection refused | Ensure MongoDB is running; check MONGO_URI |
-| CORS errors | Update VITE_API_BASE in frontend or backend CORS config |
-| Docker images won't build | Run `docker system prune -a` to clean dangling images |
-| Can't login after registration | Clear browser localStorage and retry |
-
----
-
-## 📄 License
-
-MIT
-
----
-
-## ✨ Next Steps
-
-- [ ] Add email verification
-- [ ] Implement refresh token rotation
-- [ ] Add API rate limiting (express-rate-limit)
-- [ ] Add request validation (joi or zod)
-- [ ] Add unit/integration tests
-- [ ] Setup GitHub Actions CI/CD
-- [ ] Add websockets for real-time features
-- [ ] Implement role-based access control (RBAC)
-
----
-
-**Happy coding!** 🎉 (Auth + Dashboard)
-
-A small scaffold with:
-- Backend: Express + MongoDB (Mongoose), JWT auth
-- Frontend: Vite + React, simple login/register + protected dashboard
-
-Getting started
-
-1. Start MongoDB locally (or provide `MONGO_URI` pointing to a cloud MongoDB).
-2. Backend:
-
-```bash
-cd mern-app/backend
-cp .env.example .env
-# edit .env to set MONGO_URI and JWT_SECRET
-npm install
-npm run dev
-```
-
-3. Frontend:
-
-```bash
-cd mern-app/frontend
-npm install
-npm run dev
-```
-
-By default fronted expects backend at `http://localhost:5000/api`. Set `VITE_API_BASE` if different.
+## Next Steps (suggested)
+- Add validation (e.g., joi/zod) on create/update entity
+- Add rate limiting
+- Add tests (backend + frontend)
+- CI pipeline for lint/test/build
